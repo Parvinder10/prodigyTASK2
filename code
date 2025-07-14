@@ -1,0 +1,58 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset
+df = pd.read_csv(r"C:\Users\parvk\Downloads\test.csv")
+
+# Fill missing values safely (no chained inplace)
+df['Age'] = df['Age'].fillna(df['Age'].median())
+df['Fare'] = df['Fare'].fillna(df['Fare'].median())
+df['Cabin'] = df['Cabin'].fillna('Unknown')
+
+
+# Extract title from Name (use raw string to avoid escape warnings)
+df['Title'] = df['Name'].str.extract(r' ([A-Za-z]+)\.', expand=False)
+
+# Replace similar and rare titles
+df['Title'] = df['Title'].replace(['Mlle', 'Ms'], 'Miss')
+df['Title'] = df['Title'].replace('Mme', 'Mrs')
+df['Title'] = df['Title'].replace(['Dr', 'Rev', 'Col', 'Major', 'Capt', 'Don',
+                                   'Sir', 'Lady', 'Jonkheer', 'Countess', 'Dona'], 'Other')
+
+
+sns.set(style='whitegrid')
+
+# Age distribution
+plt.figure(figsize=(8, 4))
+sns.histplot(df['Age'], bins=30, kde=True, color='skyblue')
+plt.title("Age Distribution")
+plt.xlabel("Age")
+plt.ylabel("Count")
+plt.tight_layout()
+plt.show()
+
+# Passenger Class vs Gender
+plt.figure(figsize=(8, 4))
+sns.countplot(x='Pclass', hue='Sex', data=df, palette='Set2')
+plt.title("Passenger Class by Gender")
+plt.xlabel("Class")
+plt.ylabel("Count")
+plt.tight_layout()
+plt.show()
+
+# Fare by Class
+plt.figure(figsize=(8, 4))
+sns.boxplot(x='Pclass', y='Fare', data=df, palette='pastel')
+plt.title("Fare by Class")
+plt.tight_layout()
+plt.show()
+
+# Title Distribution
+plt.figure(figsize=(8, 4))
+sns.countplot(x='Title', data=df, order=df['Title'].value_counts().index, palette='muted')
+plt.title("Title Distribution")
+plt.xlabel("Title")
+plt.ylabel("Count")
+plt.tight_layout()
+plt.show()
